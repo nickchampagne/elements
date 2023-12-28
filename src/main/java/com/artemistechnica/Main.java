@@ -4,29 +4,28 @@ import com.artemistechnica.elements.Element;
 import com.artemistechnica.json.Serializer;
 import com.artemistechnica.models.UIList;
 
-import java.util.List;
-
 import static com.artemistechnica.elements.Element.*;
 
 public class Main {
     public static void main(String[] args) {
         App.AppContext context = new App.AppContext();
-        UIList screenUI = App.makeLoginScreen(context);
+        UIList<App.AppContext> screenUI = App.makeLoginScreen(context);
         System.out.println(Serializer.prettyPrint(screenUI));
     }
 
     public static class App {
 
-        static UIList makeLoginScreen(AppContext context) {
-            return screen(
-                    list("vertical", List.of(
+        @SuppressWarnings("unchecked")
+        static <A extends CTX> UIList<A> makeLoginScreen(A context) {
+            return (UIList<A>) screen(
+                    Element.list("vertical",
                             string("Hello, thank you for your interest to log in!"),
                             string("Please sign in below:"),
-                            list("vertical", List.of(
+                            list("vertical",
                                     string("Username:"),
-                                    string("Password:"))),
-                            list("horizontal", List.of(string("Sign In"), string("Cancel")))
-                    ))).apply(context);
+                                    string("Password:"),
+                                    list("horizontal", string("Sign In"), string("Cancel"))
+                            ))).apply(context);
         }
 
         public static class AppContext extends Context {

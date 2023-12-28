@@ -5,15 +5,15 @@ import com.artemistechnica.elements.Element;
 
 import java.util.List;
 
-public interface UIList extends UIComponent {
+public interface UIList<A extends Element.CTX> extends UIComponent<A> {
 
     String getOrientation();
 
-    List<? extends UIComponent> getValue();
+    List<? extends UIComponent<A>> getValue();
 
 //    List<UIComponent> getValue();
-     static <A extends UIComponent, B extends Element.CTX> UIList make(B ctx, String direction, List<A> v) {
-        return new UIList() {
+     static <B extends Element.CTX, A extends UIComponent<B>> UIList<B> make(B ctx, String direction, List<A> v) {
+        return new UIList<>() {
             private final B context = ctx;
 
             private final String orientation = direction;

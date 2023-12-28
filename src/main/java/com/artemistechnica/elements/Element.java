@@ -6,6 +6,7 @@ import com.artemistechnica.models.UIComponent;
 import com.artemistechnica.models.UIList;
 import com.artemistechnica.models.UIString;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -15,20 +16,20 @@ public interface Element {
         return (c) -> ctx.apply(Context.inc(c));
     }
 
-    static <B extends Model> Function<Main.App.AppContext, B> screen(Function<Main.App.AppContext, B> ctx) {
+    static <A extends CTX, B extends Model> Function<A, B> screen(Function<A, B> ctx) {
         return element(ctx);
     }
 
-    static <A extends CTX> Function<A, UIList> list(String direction, List<Function<A, ? extends UIComponent>> listFns) {
-        return (ctx) -> UIList.make(ctx, direction, listFns.stream().map(fn -> element(fn).apply(ctx)).toList());
+    static <A extends CTX> Function<A, UIList<A>> list(String direction, Function<A, ? extends UIComponent<A>>... listFns) {
+        return (ctx) -> UIList.make(ctx, direction, Arrays.stream(listFns).map(fn -> element(fn).apply(ctx)).toList());
     }
 
-    static Function<Main.App.AppContext, UIString> string(String str) {
+    static <A extends CTX>Function<A, UIString<A>> string(String str) {
         return (ctx) -> UIString.make(ctx, str);
     }
 
-    default <B extends Model> List<Function<Main.App.AppContext, B>> screenListFns(List<B> elements) {
-        return elements.stream().map(element -> screen(ctx -> element)).toList();
+    default <A extends CTX, B extends Model> List<Function<A, B>> screenListFns(List<B> elements) {
+        return elements.stream().map(element -> (Function<A, B>) screen(ctx -> element)).toList();
     }
 
     default <B extends Model> Function<Main.App.AppContext, List<B>> screenList(List<B> elements) {
@@ -74,7 +75,7 @@ public interface Element {
         };
     }
 
-    default <A extends Main.App.AppContext> Function<A, UIString> UIString(A ctx, String value) {
+    default <A extends CTX> Function<A, UIString<A>> UIString(A ctx, String value) {
         return context -> UIString.make(ctx, String.format("uiString {\n\t\t\t%s\n\t\t}", value));
     }
 
