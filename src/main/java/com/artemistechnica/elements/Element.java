@@ -27,57 +27,6 @@ public interface Element {
         return (ctx) -> UIString.make(ctx, str);
     }
 
-    default <B extends Model> List<Function<Main.App.AppContext, B>> screenListFns(List<B> elements) {
-        return elements.stream().map(element -> screen(ctx -> element)).toList();
-    }
-
-    default <B extends Model> Function<Main.App.AppContext, List<B>> screenList(List<B> elements) {
-        return (ctx) -> elements;
-    }
-
-    default Function<Context, Component> component(Function<Context, Component> ctx) {
-        return context -> {
-            return Component.make(String.format("component {\n\t%s\n}", ctx.apply(context).value));
-        };
-    }
-
-    default Function<Context, Component> header(Function<Context, Component> ctx) {
-        return context -> {
-            return Component.make(String.format("header {\n\t\t%s\n\t}", ctx.apply(context).value));
-        };
-    }
-
-    default Function<Context, Component> block(Function<Context, Component> ctx) {
-        return context -> {
-            return Component.make(String.format("block {\n\t\t\t%s\n\t\t}", ctx.apply(context).value));
-        };
-    }
-
-    default Function<Context, Component> span(List<Component> components, boolean horizontal) {
-        return context -> {
-            String direction = horizontal ? "\t" : "\n";
-            String padding = horizontal ? "\t"  : "\t\t\t";
-            String str = String.format("\t\t\t%s", String.join(direction + padding, components.stream().map(v -> v.value).toList()));
-            Component cmp = components.stream().reduce(Component.pure(), (acc, c) -> Component.make(str));
-            String tab = "\t".repeat(context.getDepth());
-            return Component.make(String.format("\"span\": {\n%s%s\n\t\t}", tab, cmp.value));
-        };
-    }
-
-    default Function<Context, Component> spanFn(List<Function<Context, Component>> componentFns) {
-        return context -> {
-            List<Component> components = componentFns.stream().map(fn -> fn.apply(context)).toList();
-            String str = String.format("\t\t\t%s", String.join(",", components.stream().map(v -> v.value).toList()));
-            Component cmp = components.stream().reduce(Component.pure(), (acc, c) -> Component.make(str));
-            String tab = "\t".repeat(context.getDepth());
-            return Component.make(String.format("\"span_"+context.getDepth() + "\": {\n%s%s\n\t\t}", tab, cmp.value));
-        };
-    }
-
-    default <A extends Main.App.AppContext> Function<A, UIString> UIString(A ctx, String value) {
-        return context -> UIString.make(ctx, String.format("uiString {\n\t\t\t%s\n\t\t}", value));
-    }
-
     interface CTX {
         int getDepth();
         <A extends CTX> A pure(int depth);
